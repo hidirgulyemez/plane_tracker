@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: israel-turkey-flight-tracker
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    healthCheckPath: /health
+    envVars:
+      - key: OPENSKY_USERNAME
+        value: ""  # Add your OpenSky username here (optional)
+      - key: OPENSKY_PASSWORD
+        value: ""  # Add your OpenSky password here (optional)
+      - key: POLL_INTERVAL
+        value: "20"  # Background polling frequency in seconds
+      - key: RECENT_WINDOW_HOURS
+        value: "6"   # Flight history lookup window in hours
+      - key: MAX_AIRCRAFT_TO_QUERY
+        value: "120" # Maximum aircraft to check per update

@@ -1,0 +1,7 @@
+Flask==2.3.3
+Flask-CORS==4.0.0
+requests==2.31.0
+gunicorn==21.2.0
+opensky-api==1.7.0
+shapely==2.0.2
+git+https://github.com/openskynetwork/opensky-api.git#subdirectory=python
