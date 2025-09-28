@@ -32,7 +32,7 @@ TURKEY_POLY = Polygon([
 ])
 
 def is_israel_airport(icao):
-    return icao and icao.upper().startswith("LL")
+    return icao and icao.upper().startswith("TUR")
 
 STATES_URL = "https://opensky-network.org/api/states/all"
 FLIGHTS_AIRCRAFT_URL = "https://opensky-network.org/api/flights/aircraft"
@@ -223,3 +223,4 @@ if __name__=="__main__":
     t=Thread(target=background_poller,daemon=True)
     t.start()
     app.run(host="0.0.0.0",port=int(os.getenv("PORT","5000")),debug=False)
+
