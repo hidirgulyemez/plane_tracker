@@ -156,20 +156,35 @@ FRONTEND_HTML = """
   <title>Turkish airspace — aircraft from/to Israel</title>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <style>html,body,#map{height:100%;margin:0;padding:0}</style>
+  <style>
+    html,body{height:100%;margin:0;padding:0}
+    #container{display:flex;height:100%}
+    #map{flex:3}
+    #list{flex:1;overflow:auto;padding:0.5em;font-family:sans-serif;font-size:14px;background:#f9f9f9}
+    #list h2{margin-top:0}
+    .flight{margin-bottom:1em;border-bottom:1px solid #ccc;padding-bottom:0.5em}
+  </style>
 </head>
 <body>
-<div id="map"></div>
+<div id="container">
+  <div id="map"></div>
+  <div id="list">
+    <h2>Flights</h2>
+    <div id="flights"></div>
+  </div>
+</div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-const map = L.map('map').setView([39, 34], 5);
+const map=L.map('map').setView([39,34],5);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18, attribution:'© OpenStreetMap contributors'}).addTo(map);
-let markers = {};
+let markers={};
+
 async function update(){
   try{
     const res=await fetch('/api/turkey-israel-flights');
     const data=await res.json();
     const idsSeen=new Set();
+    let listHtml='';
     for(const f of data.results){
       const id=f.icao24;
       idsSeen.add(id);
@@ -179,13 +194,19 @@ async function update(){
       } else {
         markers[id]=L.marker([f.lat,f.lon]).addTo(map).bindPopup(popup);
       }
+      // build list HTML
+      const flightsInfo=f.matched_flights.map(m=>`${m.estDepartureAirport||'?' } → ${m.estArrivalAirport||'?'}`).join('<br/>');
+      listHtml+=`<div class="flight"><strong>${f.callsign||'(no callsign)'}</strong><br/>
+                 ICAO24: ${f.icao24}<br/>${flightsInfo}</div>`;
     }
+    // remove stale markers
     for(const id in markers){
       if(!idsSeen.has(id)){
         map.removeLayer(markers[id]);
         delete markers[id];
       }
     }
+    document.getElementById('flights').innerHTML=listHtml || '<p>No matching flights right now.</p>';
   }catch(e){console.error("update failed",e);}
 }
 update();
