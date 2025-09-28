@@ -1,1 +1,2 @@
-web: gunicorn plane_tracker:app --workers=2 --threads=4 --timeout 60
+web: gunicorn app:app --workers=2 --threads=4 --timeout 60
+
